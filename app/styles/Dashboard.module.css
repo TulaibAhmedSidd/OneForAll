@@ -1,0 +1,34 @@
+.gameList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .gameCard {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+    border-radius: 8px;
+    background-color: #fff;
+  }
+  
+  .gameCard h3 {
+    font-size: 1.5em;
+  }
+  
+  .gameCard button {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .gameCard button:hover {
+    background-color: #0056b3;
+  }
+  
