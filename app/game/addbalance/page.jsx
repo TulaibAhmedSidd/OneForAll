@@ -10,30 +10,35 @@ export default function AddBalance() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/wallet/topUp/${paymentMethod}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ amount }),
+      });
 
-    const token = localStorage.getItem('token');
+      const data = await response.json();
+      setIsProcessing(false);
 
-    const response = await fetch(`/api/wallet/topup/${paymentMethod}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({ amount }),
-    });
+      if (response.ok) {
+        alert('Balance added successfully!');
+        setIsProcessing(false);
 
-    const data = await response.json();
-    setIsProcessing(false);
-
-    if (response.ok) {
-      alert('Balance added successfully!');
-    } else {
-      alert(data.error || 'An error occurred');
+      } else {
+        setIsProcessing(false);
+        alert(data.error || 'An error occurred');
+      }
+    } catch (error) {
+      console.log(error)
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className=" min-h-[70vh] max-w-lg mx-auto p-6 mt-20 bg-slate-400 rounded-lg shadow-lg">
       <h2 className="text-2xl font-semibold text-center mb-6">Add Balance</h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -43,7 +48,7 @@ export default function AddBalance() {
             id="amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="w-full px-4 py-2 mt-1 border rounded-lg"
+            className="w-full px-4 py-2 mt-1 border rounded-lg text-black"
             required
           />
         </div>
@@ -55,7 +60,7 @@ export default function AddBalance() {
               value="easypaisa"
               checked={paymentMethod === 'easypaisa'}
               onChange={() => setPaymentMethod('easypaisa')}
-              className="mr-2"
+              className="mr-2 text-black"
             />
             EasyPaisa
           </label>
@@ -66,7 +71,7 @@ export default function AddBalance() {
               value="stripe"
               checked={paymentMethod === 'stripe'}
               onChange={() => setPaymentMethod('stripe')}
-              className="mr-2"
+              className="mr-2 text-black"
             />
             Stripe
           </label>

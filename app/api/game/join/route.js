@@ -51,7 +51,7 @@ export async function POST(req) {
     await game.save();
 
     // Deduct the balance from the user
-    user.walletBalance -= 1;
+    user.walletBalance -= game?.gameAmount;
     await user.save();
 
     return NextResponse.json({ message: 'Successfully joined the game' }, { status: 200 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { FaHome, FaGamepad, FaUser, FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+import { FaHome,  FaUser, FaSignInAlt, FaUserPlus, FaGamepad, FaCreativeCommonsSampling } from 'react-icons/fa';
 
 const Header = () => {
   return (
@@ -24,6 +24,9 @@ const Header = () => {
           </li>
           <li className="flex items-center space-x-1 hover:text-blue-500">
             <FaUserPlus /> <Link href="/game/create">Create Game</Link>
+          </li>
+          <li className="flex items-center space-x-1 hover:text-blue-500">
+            <FaCreativeCommonsSampling /> <Link href="/game">Game Management</Link>
           </li>
         </ul>
       </nav>

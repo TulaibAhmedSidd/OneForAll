@@ -6,9 +6,12 @@ const gameSchema = new mongoose.Schema({
     ref: 'User', 
     required: true 
   },
-  gameType: { 
+  gameName: { 
     type: String, 
-    enum: ['1rupee', '10rupee', '50rupee'], 
+    required: true 
+  },
+  gameAmount: { 
+    type: Number, 
     required: true 
   },
   requiredUsers: { 
@@ -22,7 +25,7 @@ const gameSchema = new mongoose.Schema({
   status: { 
     type: String, 
     enum: ['pending', 'active', 'completed', 'cancelled'], 
-    default: 'pending' 
+    default: 'active' 
   },
   startTime: { 
     type: Date, 
@@ -30,10 +33,6 @@ const gameSchema = new mongoose.Schema({
   },
   endTime: { 
     type: Date, 
-    required: true 
-  },
-  prizeAmount: { 
-    type: Number, 
     required: true 
   },
   gameResult: { 
