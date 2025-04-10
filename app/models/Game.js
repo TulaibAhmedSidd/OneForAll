@@ -40,6 +40,18 @@ const gameSchema = new mongoose.Schema({
     enum: ['win', 'loss', 'pending'], 
     default: 'pending' 
   },
+  gamePrize: [
+    {
+      prize: { type: mongoose.Schema.Types.ObjectId, ref: 'GamePrize' },
+      quantity: { type: Number, required: true },
+      winners: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    },
+  ],
+  // gamePrize: { 
+  //   type: mongoose.Schema.Types.ObjectId, 
+  //   ref: 'GamePrize', 
+  //   required: true 
+  // },
   winner: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User', 
@@ -48,7 +60,8 @@ const gameSchema = new mongoose.Schema({
   resultAnnouncedByAdmin: { 
     type: Boolean, 
     default: false 
-  }
+  },
+  paused: { type: Boolean, default: false }
 });
 
 export default mongoose.models.Game || mongoose.model('Game', gameSchema);

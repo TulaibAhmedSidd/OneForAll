@@ -18,12 +18,17 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
-    const { gameName, gameAmount, requiredUsers, startTime, endTime } = await req.json();
+    const { gameName, gameAmount, requiredUsers, startTime, endTime, prizeList } = await req.json();
 
-    if (!gameName || !gameAmount || !requiredUsers || !startTime || !endTime) {
-      return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+    if (!gameName || !gameAmount || !requiredUsers || !startTime || !endTime || !prizeList?.length) {
+      return NextResponse.json({ error: 'All fields are required including prize list' }, { status: 400 });
     }
-
+    
+    const formattedPrizes = prizeList.map(p => ({
+      prize: p.prizeId,
+      quantity: p.quantity
+    }));
+    
     const newGame = new Game({
       adminId: userData.id,
       gameName,
@@ -31,8 +36,9 @@ export async function POST(req) {
       requiredUsers,
       startTime: new Date(startTime),
       endTime: new Date(endTime),
+      gamePrize: formattedPrizes
     });
-
+    
     await newGame.save();
 
     return NextResponse.json({ message: 'Game created successfully', game: newGame }, { status: 201 });

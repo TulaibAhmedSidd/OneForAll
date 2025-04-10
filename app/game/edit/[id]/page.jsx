@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const CreateGame = () => {
+const EditGame = (params) => {
+  console.log("params",)
+
+  const gameId = params?.params?.id;
   const [gameName, setGameName] = useState('');
   const [gameAmount, setGameAmount] = useState('');
   const [requiredUsers, setRequiredUsers] = useState('');
@@ -12,10 +15,9 @@ const CreateGame = () => {
   const [prizeAmount, setPrizeAmount] = useState('');
   const [error, setError] = useState('');
   const [prizes, setPrizes] = useState([]);
+  const [Game, setGame] = useState(null);
   const [selectedPrize, setSelectedPrize] = useState(""); // Initial state for the selected value
   const router = useRouter();
-  const [selectedPrizes, setSelectedPrizes] = useState([{ prizeId: '', quantity: '' }]);
-
   const fetchPrizes = async () => {
     try {
       const res = await fetch('/api/game-prize/get-all');
@@ -34,6 +36,32 @@ const CreateGame = () => {
   useEffect(() => {
     fetchPrizes();
   }, []);
+  console.log("game",Game)
+  const fetchGame = async (id) => {
+    try {
+      const res = await fetch(`/api/game/${id}`);
+      const data = await res.json();
+      if (res.ok) {
+        setGame(data);
+        setGameName(data?.gameName)
+        setGameAmount(data?.gameAmount)
+        setRequiredUsers(data?.requiredUsers)
+        setStartTime(new Date(data?.startTime))
+        setEndTime(new Date(data?.endTime))
+        setPrizeAmount(data?.gameAmount)
+        setSelectedPrize(data?.gamePrize)
+      } else {
+        setError(data.error || 'Failed to fetch prizes');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Server error fetching prizes.');
+    }
+  };
+
+  useEffect(() => {
+    fetchGame(gameId);
+  }, [gameId]);
   const handleChange = (event) => {
     setSelectedPrize(event.target.value); // Update state when an option is selected
   };
@@ -58,25 +86,12 @@ const CreateGame = () => {
       startTime,
       endTime,
       prizeAmount: Number(prizeAmount),
-      prizeList: selectedPrizes.map(p => ({
-        prizeId: p?.prizeId,
-        quantity: Number(p?.quantity)
-      }))
+      prizeId: selectedPrize
     };
 
-    // const gameData = {
-    //   gameName,
-    //   gameAmount: Number(gameAmount),
-    //   requiredUsers: Number(requiredUsers),
-    //   startTime,
-    //   endTime,
-    //   prizeAmount: Number(prizeAmount),
-    //   prizeId: selectedPrize,
-    // };
-
     try {
-      const res = await fetch('/api/game/create', {
-        method: 'POST',
+      const res = await fetch(`/api/game/update/${gameId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -86,11 +101,11 @@ const CreateGame = () => {
 
       const result = await res.json();
 
-      if (res.status === 201) {
+      if (res.status === 201 || res.status === 200) {
         router.push('/dashboard');
         setSelectedPrize(null);
       } else {
-        setError(result.error || 'Error creating the game.');
+        setError(result.error || 'Error updating the game.');
       }
     } catch (err) {
       console.error('Error:', err);
@@ -102,7 +117,7 @@ const CreateGame = () => {
     <div className="min-h-screen bg-slate-400 dark:bg-gray-900 text-gray-900 dark:text-slate-200 px-6 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center text-blue-700 dark:text-blue-400 mb-6">
-          Create a New Game
+          Update a New Game
         </h1>
         {error && <p className="text-red-600 text-center mb-4">{error}</p>}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,13 +137,7 @@ const CreateGame = () => {
             <input
               type="number"
               value={gameAmount}
-              onChange={(e) => {
-                const gameAm = e.target.value;
-                setGameAmount(gameAm)
-                if (requiredUsers) {
-                  setPrizeAmount(requiredUsers * gameAm)
-                }
-              }}
+              onChange={(e) => setGameAmount(e.target.value)}
               className="w-full text-blue-950 mt-2 p-3 border rounded-md"
               placeholder="Amount user pays to join"
             />
@@ -139,15 +148,7 @@ const CreateGame = () => {
             <input
               type="number"
               value={requiredUsers}
-              onChange={(e) => {
-                const reqUser = e.target.value;
-                setRequiredUsers(reqUser)
-                if (gameAmount) {
-                  setPrizeAmount(gameAmount * reqUser)
-                }
-              }
-              }
-
+              onChange={(e) => setRequiredUsers(e.target.value)}
               className="w-full text-blue-950 mt-2 p-3 border rounded-md"
               placeholder="Number of users required"
             />
@@ -178,13 +179,12 @@ const CreateGame = () => {
             <input
               type="number"
               value={prizeAmount}
-              disabled
               onChange={(e) => setPrizeAmount(e.target.value)}
               className="w-full text-blue-950 mt-2 p-3 border rounded-md"
               placeholder="Amount in rupees"
             />
           </div>
-          {/* <div>
+          <div>
             <label className="block text-lg font-medium">Select Winning Prize</label>
             <select
               className="p-2 w-full rounded-md border border-gray-300 text-blue-950"
@@ -201,61 +201,13 @@ const CreateGame = () => {
                 </option>
               ))}
             </select>
-          </div> */}
-
-          {selectedPrizes.map((entry, index) => (
-            <div key={index} className="flex gap-2 items-center mb-2">
-              <select
-                className="p-2 rounded-md border w-1/2 text-blue-950"
-                value={entry.prizeId}
-                onChange={(e) => {
-                  const updated = [...selectedPrizes];
-                  updated[index].prizeId = e.target.value;
-                  setSelectedPrizes(updated);
-                }}
-              >
-                <option value="">-- Select Prize --</option>
-                {prizes.map(p => (
-                  <option key={p._id} value={p._id}>{p.prizeName}</option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder="Quantity"
-                className="p-2 rounded-md border w-1/2 text-blue-950"
-                value={entry.quantity}
-                onChange={(e) => {
-                  const updated = [...selectedPrizes];
-                  updated[index].quantity = e.target.value;
-                  setSelectedPrizes(updated);
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  const updated = [...selectedPrizes];
-                  updated.splice(index, 1);
-                  setSelectedPrizes(updated);
-                }}
-                className="text-red-600 font-bold"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => setSelectedPrizes([...selectedPrizes, { prizeId: '', quantity: '' }])}
-            className="mt-2 text-blue-600 underline"
-          >
-            + Add Another Prize
-          </button>
+          </div>
 
           <button
             type="submit"
             className="w-full bg-blue-700 text-white p-3 rounded-md hover:bg-blue-800 transition duration-300"
           >
-            Create Game
+            Update Game
           </button>
         </form>
       </div>
@@ -263,4 +215,4 @@ const CreateGame = () => {
   );
 };
 
-export default CreateGame;
+export default EditGame;

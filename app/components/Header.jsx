@@ -1,12 +1,12 @@
 import React from 'react';
 import Link from 'next/link';
-import { FaHome,  FaUser, FaSignInAlt, FaUserPlus, FaGamepad, FaCreativeCommonsSampling } from 'react-icons/fa';
+import { FaHome,  FaUser, FaSignInAlt, FaUserPlus, FaGamepad, FaCreativeCommonsSampling , FaGifts} from 'react-icons/fa';
 
 const Header = () => {
   return (
     <header className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50">
-      <nav className="max-w-6xl mx-auto flex justify-between items-center p-4 text-blue-700 dark:text-blue-400">
-        <div className="text-2xl font-bold">
+      <nav className="max-w-6xl mx-auto items-center p-4 text-blue-700 dark:text-blue-400">
+        <div className="text-2xl font-bold mx-auto">
           <Link href="/">OneForAll</Link>
         </div>
         <ul className="flex space-x-6 text-lg">
@@ -27,6 +27,9 @@ const Header = () => {
           </li>
           <li className="flex items-center space-x-1 hover:text-blue-500">
             <FaCreativeCommonsSampling /> <Link href="/game">Game Management</Link>
+          </li>
+          <li className="flex items-center space-x-1 hover:text-blue-500">
+            <FaGifts /> <Link href="/gamePrize">Game Prize Manage</Link>
           </li>
         </ul>
       </nav>

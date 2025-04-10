@@ -17,15 +17,15 @@ export async function GET(req) {
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-
+    return NextResponse?.json(user)
     // Send back the latest data for the user
-    return NextResponse.json({
-      username: user.username,
-      email: user.email,
-      walletBalance: user.walletBalance,
-      gamesPlayed: user.gamesPlayed,
-      prizesWon: user.prizesWon,
-    });
+    // return NextResponse.json({
+    //   username: user.username,
+    //   email: user.email,
+    //   walletBalance: user.walletBalance,
+    //   gamesPlayed: user.gamesPlayed,
+    //   prizesWon: user.prizesWon,
+    // });
   } catch (error) {
     console.error('Error fetching user data:', error);
     return NextResponse.json({ error: 'Failed to fetch user data' }, { status: 500 });
