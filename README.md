@@ -1,36 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# One For All
 
-## Getting Started
+Rs 1 / 5 / 10 tickets for real prizes, with draws anyone can verify. Next.js 14 PWA + MongoDB, deployed on Vercel.
 
-First, run the development server:
+- **Rules for contributors and AI agents:** [AGENTS.md](AGENTS.md)
+- **Audit, scaling plan, go-live hurdles:** [docs/SCALING-AND-LAUNCH.md](docs/SCALING-AND-LAUNCH.md)
+- **Daily progress:** [progress/README.md](progress/README.md)
+
+## Run locally
 
 ```bash
+npm install
+cp .env.example .env.local
+npm run db        # keep running: local Mongo replica set (transactions need one)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then seed demo data and run the money checks:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```bash
+BASE=http://localhost:3000 node scripts/seed-demo.mjs
+BASE=http://localhost:3000 npm run test:api
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Deploy
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Push to `main` → Vercel builds. Set the environment variables listed in AGENTS.md first
+(`MONGO_URI`, `JWT_SECRET`, `ADMIN_EMAILS`, `CRON_SECRET`, `CLOUDINARY_*`). If the database already
+has games from the first version, run `node scripts/migrate-v1.mjs` once (see the script header).

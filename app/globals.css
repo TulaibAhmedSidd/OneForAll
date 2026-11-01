@@ -3,31 +3,58 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --stub: 104px; /* height of the tear-off stub at the bottom of a ticket */
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+html { -webkit-tap-highlight-color: transparent; }
+body { @apply bg-paper text-ink font-sans antialiased; }
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-6xl px-4 sm:px-6; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 font-semibold transition active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold/50; min-height: 48px; }
+  .btn-gold { @apply btn bg-gold text-forest-deep hover:bg-[#F0C25E] shadow-[inset_0_-2px_0_rgba(0,0,0,.12)]; }
+  .btn-forest { @apply btn bg-forest text-white hover:bg-forest-soft; }
+  .btn-ghost { @apply btn border border-line bg-white text-ink hover:border-jade hover:text-jade; }
+  .btn-danger { @apply btn bg-coral text-white hover:brightness-95; }
+  .btn-sm { min-height: 38px; @apply px-3.5 text-sm rounded-lg; }
+
+  .field { @apply block w-full rounded-xl border border-line bg-white px-4 text-base text-ink placeholder:text-ink-mute transition focus:border-jade focus:outline-none focus:ring-4 focus:ring-jade/15; min-height: 50px; }
+  .label { @apply mb-1.5 block text-sm font-semibold text-ink-soft; }
+
+  .card { @apply rounded-2xl border border-line bg-white; }
+  .eyebrow { @apply font-mono text-[11px] font-medium uppercase tracking-[.18em]; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold; }
+
+  /* The signature: a real tear-off ticket. Two notches are cut out of the card edges
+     where the perforation runs, using masks so it works on any background. */
+  .ticket {
+    @apply relative rounded-ticket bg-white shadow-ticket;
+    -webkit-mask:
+      radial-gradient(circle 11px at 0 calc(100% - var(--stub)), transparent 10px, #000 10.5px) left / 51% 100% no-repeat,
+      radial-gradient(circle 11px at 100% calc(100% - var(--stub)), transparent 10px, #000 10.5px) right / 51% 100% no-repeat;
+    mask:
+      radial-gradient(circle 11px at 0 calc(100% - var(--stub)), transparent 10px, #000 10.5px) left / 51% 100% no-repeat,
+      radial-gradient(circle 11px at 100% calc(100% - var(--stub)), transparent 10px, #000 10.5px) right / 51% 100% no-repeat;
+  }
+  .ticket-perf {
+    position: absolute; left: 16px; right: 16px; bottom: var(--stub); height: 0;
+    border-top: 2px dashed theme('colors.line');
+  }
+  .ticket-stub { height: var(--stub); }
+
+  .grain {
+    background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+  .guilloche {
+    background-image:
+      repeating-radial-gradient(circle at 85% 20%, rgba(232,182,76,.10) 0 1px, transparent 1px 14px),
+      repeating-radial-gradient(circle at 10% 110%, rgba(255,255,255,.06) 0 1px, transparent 1px 18px);
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
